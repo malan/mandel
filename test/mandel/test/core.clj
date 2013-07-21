@@ -12,3 +12,10 @@
 
 (deftest test-square
 	(is (= (square c-test) {:R 0.0 :C 2.0})))
+
+(deftest test-breaks-mandel
+	(is (false? (breaks-mandel {:R 0.1, :C 0.1} 100)))
+	(is (breaks-mandel c-test 5)))
+
+(deftest test-map-to-plane
+	(is (= start (map-to-plane 0 0))))
