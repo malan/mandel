@@ -2,5 +2,13 @@
   (:use [mandel.core])
   (:use [clojure.test]))
 
-(deftest replace-me ;; FIXME: write
-  (is false "No tests have been written."))
+(def c-test {:R 1.0 :C 1.0})
+
+(deftest test-abs
+	(is (= (abs c-test) (. Math sqrt 2))))
+
+(deftest test-add
+	(is (= (add c-test c-test) {:R 2.0 :C 2.0})))
+
+(deftest test-square
+	(is (= (square c-test) {:R 0.0 :C 2.0})))
