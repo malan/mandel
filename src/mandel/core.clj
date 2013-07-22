@@ -5,16 +5,12 @@
         (java.awt.image BufferedImage)
         (java.awt Dimension Color)))
 
-
-(def canvas-width 105)
-(def canvas-height 75)
+(def canvas-width 400)
+(def canvas-height 400)
 (def start {:R -2.1 :C -1.4})
 (def width 3.0)
 (def height 3.0)
 (def max-iterations 100)
-
-(defn -main [& args]
-  (println "Hello Mandel!"))
 
 ; Calculate the absolute value of a complex number. Given z = r + ci, |z| = sqrt(r^2 + c^2)
 (defn abs [{r :R c :C}]
@@ -48,11 +44,40 @@
 	(for [y (range canvas-height)
 			x (range canvas-width)]
 		[x y (breaks-mandel (map-to-plane x y) max-iterations)]))
-			
+
+; Renders a mandel set in ASCII characters			
 (defn draw-ascii-mandel-map [mandel-map]
 	(doseq [[x y iter] mandel-map]
 			(if iter (print "*") (print " "))
 			(if (= (inc x) canvas-width) (println))))
-			
-(draw-ascii-mandel-map (generate-mandel-map))
 
+; Maps a mandel iteration to a cool colour
+(defn map-colour [iter]
+	(if iter 
+		(Color. (int (* (. Math sin (/ iter max-iterations)) 255)) 0 0)
+		(Color. 0 0 0)))
+
+; Draws the point of a mandel set on a Image Java Swing object
+(defn draw-mandel-points[mandel-map graphics]
+	(doseq [[x y iter] mandel-map]
+		(.setColor graphics (map-colour iter))
+		(.drawLine graphics x y x y)))
+
+; Draws a mandel set on a Swing GUI
+(defn draw-mandel-map [mandel-map]
+	(let [	image (BufferedImage. canvas-width canvas-height BufferedImage/TYPE_INT_RGB)
+			graphics (.createGraphics image)
+			canvas (proxy [JLabel] []
+                 (paint [g]  
+                   (.drawImage g image 0 0 this)))]
+
+		(draw-mandel-points mandel-map graphics)
+
+		(doto (JFrame.)
+		      (.add canvas)
+		      (.setSize (Dimension. canvas-width canvas-height))
+		      (.show))))
+
+(defn -main [& args]
+	(println "Drawing factal")
+  	(time (draw-mandel-map (generate-mandel-map))))
